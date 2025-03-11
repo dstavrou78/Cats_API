@@ -13,10 +13,12 @@ Get an API key from https://thecatapi.com/#pricing
    * Set your SQL Server and database name in ConnectionStrings section.
    * Copy the acquired API key to api_key field.
     ```
+    "cats_api_settings": {
     "api_key": "API_KEY",
-    "ConnectionStrings": {
-        "DefaultConnection": "Server=SERVER_NAME;Database=DB_NAME;Trusted_Connection=True;TrustServerCertificate=True;"
-    }
+    "api_address": "https://api.thecatapi.com"
+  },"ConnectionStrings": {
+    "DefaultConnection": "Server=SERVER_NAME;Database=DB_NAME;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
     ```
 
 ## API Reference

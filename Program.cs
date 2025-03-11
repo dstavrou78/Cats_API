@@ -10,6 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddHttpClient("cats", httpClient =>
+{
+    string? apiAddress = builder.Configuration.GetValue<string>("cats_api_settings:api_address");
+    string? apiKey = builder.Configuration.GetValue<string>("cats_api_settings:api_key");
+
+    if(!string.IsNullOrEmpty(apiAddress))
+        httpClient.BaseAddress = new Uri(apiAddress);
+
+    if(!string.IsNullOrEmpty(apiKey))
+        httpClient.DefaultRequestHeaders.Add("x-api-key", apiKey);
+});
+
 builder.Services.AddScoped<IExternalAPI, ExternalAPI>();
 
 builder.Services.AddDbContext<CatsContext>(options =>

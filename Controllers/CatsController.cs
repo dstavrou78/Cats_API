@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Cats_API.Models;
 using Cats_API.Interfaces;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace Cats_API.Controllers
 {
@@ -18,21 +19,15 @@ namespace Cats_API.Controllers
     {
         private readonly CatsContext _context;
         private readonly IExternalAPI _externalAPI;
-        private readonly IConfiguration _configuration;
-        private readonly string? _api_key;
+        private readonly HttpClient _client;
 
-        private static HttpClient sharedClient = new()
-        {
-            BaseAddress = new Uri("https://api.thecatapi.com"),
-        };      
-
-        public CatsController(CatsContext context, IConfiguration configuration, IExternalAPI externalAPI)
+        public CatsController(CatsContext context, IExternalAPI externalAPI, IHttpClientFactory factory)
         {
             _context = context;
             //_context.Database.EnsureCreated();
-            _configuration = configuration;
             _externalAPI = externalAPI;
-            _api_key = configuration.GetValue<string>("api_key");
+            var client = factory.CreateClient("cats");
+            _client = client;
         }
 
         // GET: api/Cats/fetch
@@ -43,7 +38,18 @@ namespace Cats_API.Controllers
         [Route("fetch")]
         public async Task Fetch()
         {
-            await _externalAPI.GetAsync(sharedClient, _context, _api_key);
+            if (_client.BaseAddress == null)
+                throw new BadHttpRequestException("Invalid Cats API address");
+
+            try
+            {
+                await _externalAPI.GetAsync(_client, _context);
+            }
+            catch (Exception ex){
+                throw new BadHttpRequestException(ex.Message);
+            }
+            
+
         }
 
 

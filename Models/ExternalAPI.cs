@@ -10,12 +10,8 @@ namespace Cats_API.Models
         {
             // ...
         }
-        public async Task GetAsync(HttpClient httpClient, CatsContext db, string? api_key)
+        public async Task GetAsync(HttpClient httpClient, CatsContext db)
         {
-            if (api_key != null && !httpClient.DefaultRequestHeaders.Contains("x-api-key"))
-            {
-                httpClient.DefaultRequestHeaders.Add("x-api-key", api_key);
-            }
             using HttpResponseMessage response = await httpClient.GetAsync("v1/images/search?limit=25&has_breeds=1");
 
             if (response.EnsureSuccessStatusCode().StatusCode == System.Net.HttpStatusCode.OK)
@@ -80,11 +76,12 @@ namespace Cats_API.Models
                             }
                             catch (DbUpdateConcurrencyException)
                             {
+                                throw;
                             }
                         }
                     }
                 }
             }
-        }
+        }      
     }
 }
